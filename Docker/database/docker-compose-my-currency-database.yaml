@@ -29,8 +29,8 @@ services:
       - ${POSTGRES_DB_PORT}:5432
     networks:
       - my-currency-bridge
-    #volumes:
-    #  - ./initdb-scripts:/docker-entrypoint-initdb.d
+    volumes:
+      - ./initdb-scripts:/docker-entrypoint-initdb.d
 
   pgadmin:
     container_name: mycurrency_pgadmin4_container

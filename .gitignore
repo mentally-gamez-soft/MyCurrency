@@ -178,3 +178,6 @@ requirements*txt
 
 # ignore any secrets
 secrets
+
+# ignore the database initialisation config files
+initdb-scripts
