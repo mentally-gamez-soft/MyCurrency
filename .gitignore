@@ -135,6 +135,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.env.keys
 
 # Spyder project settings
 .spyderproject
@@ -181,3 +182,6 @@ secrets
 
 # ignore the database initialisation config files
 initdb-scripts
+
+# ignore files temp or bad
+*.bad

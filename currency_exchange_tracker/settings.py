@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
-from .app_conf import *
+from .app_conf import app_env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = APP_SECRET_KEY
+SECRET_KEY = app_env["APP_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -77,11 +77,11 @@ WSGI_APPLICATION = "currency_exchange_tracker.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": DATABASE_NAME,
-        "USER": DATABASE_USER,
-        "PASSWORD": DATABASE_PASSWORD,
+        "NAME": app_env["DATABASE_NAME"],
+        "USER": app_env["DATABASE_USER"],
+        "PASSWORD": app_env["DATABASE_PASSWORD"],
         "HOST": "127.0.0.1",
-        "PORT": DATABASE_PORT,
+        "PORT": app_env["DATABASE_PORT"],
     }
 }
 

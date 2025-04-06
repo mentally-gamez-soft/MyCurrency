@@ -1,25 +1,10 @@
 """Declare envs for the configuration module."""
 
-from .load_app_config import (
-    APP_SECRET_KEY,
-    DATABASE_NAME,
-    DATABASE_PASSWORD,
-    DATABASE_PORT,
-    DATABASE_USER,
-    PG4ADMIN_EMAIL,
-    PG4ADMIN_PORT,
-    POSTGRES_DB_PORT,
-    REDIS_PORT,
-)
+from .config import AppConfig, EnvLoader
 
-__all__ = [
-    "APP_SECRET_KEY",
-    "POSTGRES_DB_PORT",
-    "PG4ADMIN_EMAIL",
-    "PG4ADMIN_PORT",
-    "REDIS_PORT",
-    "DATABASE_NAME",
-    "DATABASE_USER",
-    "DATABASE_PASSWORD",
-    "DATABASE_PORT",
-]
+__all__ = ["app_env"]
+
+env_loader = EnvLoader()
+env_loader.get_env_config()
+config = AppConfig(env_loader.env)
+app_env = config.get_application_env()
