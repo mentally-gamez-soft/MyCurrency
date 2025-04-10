@@ -60,6 +60,8 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+# ignore local DB
+*.sqlite3
 
 # Flask stuff:
 instance/
@@ -185,3 +187,10 @@ initdb-scripts
 
 # ignore files temp or bad
 *.bad
+
+# ignore tests fixtures
+fixtures/
+*old*
+
+# visual code environment
+.vscode

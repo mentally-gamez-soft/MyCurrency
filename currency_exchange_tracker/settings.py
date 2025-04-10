@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 from .app_conf import app_env
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
 ]
 
 MIDDLEWARE = [
@@ -56,7 +58,9 @@ ROOT_URLCONF = "currency_exchange_tracker.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            os.path.join(BASE_DIR, "templates"),
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -74,17 +78,33 @@ WSGI_APPLICATION = "currency_exchange_tracker.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": app_env["DATABASE_NAME"],
+#         "USER": app_env["DATABASE_USER"],
+#         "PASSWORD": app_env["DATABASE_PASSWORD"],
+#         "HOST": "127.0.0.1",
+#         "PORT": app_env["DATABASE_PORT"],
+#         "TEST": {
+#             "NAME": "test_db_app",
+#             "USER": app_env["DATABASE_NAME"],
+#             "PASSWORD": app_env["DATABASE_PASSWORD"],
+#         },
+#     }
+# }
+
+import os
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": app_env["DATABASE_NAME"],
-        "USER": app_env["DATABASE_USER"],
-        "PASSWORD": app_env["DATABASE_PASSWORD"],
-        "HOST": "127.0.0.1",
-        "PORT": app_env["DATABASE_PORT"],
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db_app_temp.sqlite3"),
+        "TEST": {
+            "NAME": os.path.join(BASE_DIR, "test_db_app_temp.sqlite3"),
+        },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -132,3 +152,37 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# my custom applications here
+CUSTOM_APPS = [
+    "mycurrency_exchange_rates.apps.MycurrencyExchangeRatesConfig",
+]
+INSTALLED_APPS += CUSTOM_APPS
+
+# log configuration
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+        },
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": "debug.log",
+        },
+    },
+    "root": {
+        "handlers": ["console", "file"],
+        "level": "DEBUG",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "propagate": True,
+        },
+    },
+}
