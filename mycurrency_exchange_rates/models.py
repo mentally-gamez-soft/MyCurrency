@@ -57,8 +57,11 @@ class CurrencyExchangeRate(models.Model):
 
     def __str__(self):
         """Add readibility for the model."""
-        return "{} -> {}".format(
-            self.source_currency.code, self.exchanged_currency.code
+        return "{} -> {} - {} - rate: {}".format(
+            self.source_currency.code,
+            self.exchanged_currency.code,
+            self.valuation_date,
+            self.rate_value,
         )
 
     class Meta:
