@@ -8,16 +8,28 @@ from mycurrency_exchange_rates.models import ExchangeRateProvider
 
 
 def add_providers():
-    """Create the 2 providers in the DB."""
+    """Create the 4 providers in the DB."""
     ExchangeRateProvider(
-        provider_name="currencybeacon",
+        provider_name="currencybeacon 1",
         priority=1,
         active_flag=True,
         active_status=True,
     ).save()
     ExchangeRateProvider(
-        provider_name="mock",
+        provider_name="mock 1",
         priority=10,
+        active_flag=True,
+        active_status=False,
+    ).save()
+    ExchangeRateProvider(
+        provider_name="currencybeacon 2",
+        priority=20,
+        active_flag=True,
+        active_status=False,
+    ).save()
+    ExchangeRateProvider(
+        provider_name="mock 2",
+        priority=30,
         active_flag=True,
         active_status=False,
     ).save()

@@ -6,12 +6,17 @@ import arrow
 from django.test import TestCase
 from faker import Faker
 
-from mycurrency_exchange_rates.models import Currency, CurrencyExchangeRate
+from mycurrency_exchange_rates.models import (
+    Currency,
+    CurrencyExchangeRate,
+    ExchangeRateProvider,
+)
 from mycurrency_exchange_rates.services.database_managers.managers import (
     exists_currency_rates_during_interval_for_pair_of_currencies,
     get_conversion_from_database,
     get_number_of_consecutive_days,
     is_valid_currency,
+    set_next_provider_by_priority,
 )
 
 
@@ -33,6 +38,31 @@ class TestDbManagers(TestCase):
             exchanged_currency=self.dest_currency,
             rate_value=self.rate_value,
             valuation_date=self.valuation_date,
+        )
+
+        ExchangeRateProvider.objects.create(
+            provider_name="currencybeacon 1",
+            priority=1,
+            active_flag=True,
+            active_status=True,
+        )
+        ExchangeRateProvider.objects.create(
+            provider_name="mock 1",
+            priority=10,
+            active_flag=True,
+            active_status=False,
+        )
+        ExchangeRateProvider.objects.create(
+            provider_name="currencybeacon 2",
+            priority=20,
+            active_flag=True,
+            active_status=False,
+        )
+        ExchangeRateProvider.objects.create(
+            provider_name="mock 2",
+            priority=30,
+            active_flag=True,
+            active_status=False,
         )
 
     def test_is_valid_currency(self):
@@ -210,3 +240,34 @@ class TestDbManagers(TestCase):
                             valuation_date=a_tuple[0].date(),
                             rate_value=fake.numerify("#.######"),
                         )
+
+    def test_set_next_provider(self):
+        current_provider = ExchangeRateProvider.objects.filter(
+            active_status=True
+        ).first()
+        next_provider = (
+            ExchangeRateProvider.objects.filter(active_status=False)
+            .order_by("-priority")
+            .first()
+        )
+
+        self.assertIsNotNone(
+            current_provider, "The current provider can not be found !"
+        )
+        self.assertIsNotNone(
+            next_provider, "The next provider can not be found !"
+        )
+
+        response = set_next_provider_by_priority()
+
+        self.assertTrue(
+            response["status"] == "ok", "The call to the function failed !"
+        )
+        self.assertTrue(
+            response["provider-deprioritized"] == "currencybeacon 1",
+            "The de-priotized provider is unexpected !",
+        )
+        self.assertTrue(
+            response["provider-prioritized"] == "mock 1",
+            "The priotized provider is unexpected !",
+        )

@@ -5,6 +5,8 @@ import os
 
 import aiohttp
 import arrow
+from pybreaker import CircuitBreaker
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 from mycurrency_exchange_rates.models import ExchangeRateProvider
 
@@ -13,16 +15,14 @@ CURRENCY_RATES_URL = "https://api.currencybeacon.com/v1/timeseries?api_key={}&ba
 CONVERSION_URL = "https://api.currencybeacon.com/v1/convert?api_key={}&from={}&to={}&amount={}"
 CONVERSION_HISTORICAL_URL = "https://api.currencybeacon.com/v1/historical?api_key={}&base={}&date={}&symbols={}"
 
+circuit_breaker = CircuitBreaker(fail_max=5, reset_timeout=120)
 
+
+@circuit_breaker
 def currency_beacon_provider(
     source_currency, exchanged_currency, valuation_date
 ) -> dict:
     """Define the concrete function when the currency beacon provider is called."""
-    # 1. check in cache
-
-    # 2. check in DB
-
-    # 3. call API
     if valuation_date == arrow.utcnow().date():
         return asyncio.run(
             request_api_convert(source_currency, exchanged_currency)
@@ -35,6 +35,10 @@ def currency_beacon_provider(
         )
 
 
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=1, max=10),
+)
 async def request_api_convert(source_currency, exchanged_currency) -> dict:
     """Define the api request for standard conversion currency."""
     async with aiohttp.ClientSession() as session:
@@ -60,6 +64,10 @@ async def request_api_convert(source_currency, exchanged_currency) -> dict:
     }
 
 
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=1, max=10),
+)
 async def request_api_history(
     source_currency, exchanged_currency, valuation_date: arrow.Arrow
 ) -> dict:
@@ -69,7 +77,8 @@ async def request_api_history(
             CONVERSION_HISTORICAL_URL.format(
                 os.getenv("CURRENCY_BEACON_API_KEY"),
                 source_currency,
-                valuation_date.format("YYYY-MM-DD"),
+                # valuation_date.format("YYYY-MM-DD"),
+                valuation_date,
                 exchanged_currency,
             ),
             ssl=False,
@@ -92,7 +101,7 @@ async def request_time_series_api(
     to_currencies: list,
     from_date: arrow.Arrow,
     to_date: arrow.Arrow,
-):
+) -> dict:
     """Define the currency beacon request for time series currency call."""
     symbols = ",".join(to_currencies)
 

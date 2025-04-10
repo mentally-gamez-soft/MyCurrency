@@ -2,11 +2,17 @@
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from pybreaker import CircuitBreaker
 from rest_framework import viewsets
 from rest_framework.response import Response
 
 from mycurrency_exchange_rates.services.database_managers.managers import (
     get_conversion_from_database,
+    store_conversion_to_DB,
+)
+from mycurrency_exchange_rates.services.exchange_rate_service import (
+    get_current_provider_service,
+    get_exchange_rate_data,
 )
 from mycurrency_exchange_rates.tools import validate_arrow_date
 
@@ -90,37 +96,31 @@ class CurrencyExchangeRateViewSet(viewsets.ModelViewSet):
         if "ko" in arrow_date["status"]:
             return Response([arrow_date])
 
-        return Response(
-            [
-                get_conversion_from_database(
-                    from_currency=from_currency,
-                    to_currency=to_currency,
-                    valuation_date=arrow_date["arrow_date"],
-                )
-            ]
+        # data available in the backend ?
+        result = get_conversion_from_database(
+            from_currency=from_currency,
+            to_currency=to_currency,
+            valuation_date=arrow_date["arrow_date"],
         )
-        # print("from_currency => {}, to_currency => {}, valuation_date => {}".format(from_currency,to_currency,valuation_date))
-        # # 1. check in cache
-
-        # # 2. check in DB
-
-        # # 3. call API
-
-        # print("args => {}".format(args))
-        # print("kwargs => {}".format(kwargs))
-        # print(request)
-        # print(request.query_params.keys())
-        # print(type(request.query_params))
-
-        # queryset = CurrencyExchangeRate.objects.filter(source_currency__code=from_currency,exchanged_currency__code=to_currency,rate_value=arrow.Arrow()).first()
-        # serializer = self.get_serializer(queryset, many=True)
-        # print(type(serializer.data))
-        # print(serializer.data)
-        # print(len(serializer.data))
-        # return Response(serializer.data)
-
-    # def get_queryset(self):
-    #     return super().get_queryset()
+        if "message" in result.keys():
+            # go to search data in the active current provider
+            provider = get_current_provider_service()
+            response = get_exchange_rate_data(
+                source_currency=from_currency,
+                exchanged_currency=to_currency,
+                valuation_date=arrow_date["arrow_date"],
+                provider=provider,
+            )
+            if "ok" in response["status"]:
+                store_conversion_to_DB(
+                    from_currency_code=from_currency,
+                    to_currency_code=to_currency,
+                    rate_value=response["rate_value"],
+                    valuated_date=arrow_date["arrow_date"],
+                )
+            return Response([response])
+        else:
+            return Response([result])
 
 
 class CurrencyViewSet(viewsets.ModelViewSet):
@@ -131,9 +131,6 @@ class CurrencyViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         """Get all the Currencies."""
-        print("overriding here.")
         queryset = Currency.objects.all()
         serializer = self.get_serializer(queryset, many=True)
-        print(type(serializer.data))
-        print(serializer.data)
         return Response(serializer.data)

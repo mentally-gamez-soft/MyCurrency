@@ -9,7 +9,7 @@ from django.test import TestCase
 
 from mycurrency_exchange_rates.models import ExchangeRateProvider
 from mycurrency_exchange_rates.services.exchange_rate_service import (
-    get_current_provider,
+    get_current_provider_service,
     get_exchange_rate_data,
 )
 from mycurrency_exchange_rates.services.providers_service import (
@@ -52,7 +52,7 @@ class TestCurrencyBeaconProvider(TestCase):
     )
     def test_convert_history_api(self):
         """Verify the endpoint for the conversion of a currency for a specific day."""
-        self.valuation_date = arrow.Arrow(2025, 2, 13)
+        self.valuation_date = arrow.Arrow(2025, 2, 13).date()
         response = currency_beacon_provider(
             source_currency=self.source_currency,
             exchanged_currency=self.destination_currency,
@@ -169,7 +169,7 @@ class TestAdapterProvider(TestCase):
 
     def test_exchange_rate_data_no_provider_set(self):
         """Verify the endpoint for the conversion of a currency when no provider is available."""
-        provider = get_current_provider()
+        provider = get_current_provider_service()
 
         response = get_exchange_rate_data(
             source_currency=self.source_currency,
@@ -196,7 +196,7 @@ class TestAdapterProvider(TestCase):
         """Verify the endpoint for the conversion of a currency with currency beacon as the active provider."""
         self.currency_beacon_provider.active_status = True
         self.currency_beacon_provider.save()
-        provider = get_current_provider()
+        provider = get_current_provider_service()
 
         response = get_exchange_rate_data(
             source_currency=self.source_currency,
@@ -224,7 +224,7 @@ class TestAdapterProvider(TestCase):
         """Verify the endpoint for the conversion of a currency with mock as the active provider."""
         self.mock_provider.active_status = True
         self.mock_provider.save()
-        provider = get_current_provider()
+        provider = get_current_provider_service()
 
         response = get_exchange_rate_data(
             source_currency=self.source_currency,

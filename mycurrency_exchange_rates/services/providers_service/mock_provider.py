@@ -8,11 +8,6 @@ PROVIDER_NAME = "mock"
 
 def mock_provider(source_currency, exchanged_currency, valuation_date) -> dict:
     """Define the concrete function when the mock provider is called."""
-    # 1. check in cache
-
-    # 2. check in DB
-
-    # 3. call API
     if valuation_date >= arrow.Arrow.utcnow().shift(days=1).date():
         return {
             "status": "ko",
@@ -23,7 +18,7 @@ def mock_provider(source_currency, exchanged_currency, valuation_date) -> dict:
     return request_api(source_currency, exchanged_currency, valuation_date)
 
 
-def request_api(source_currency, exchanged_currency, valuation_date):
+def request_api(source_currency, exchanged_currency, valuation_date) -> dict:
     """Define the mock request for standard conversion currency call."""
     fake = Faker()
     rate_value = fake.numerify("#.######")
@@ -43,7 +38,7 @@ def request_time_series_api(
     to_currencies: list,
     from_date: arrow.Arrow,
     to_date: arrow.Arrow,
-):
+) -> dict:
     """Define the mock request for time series currency call."""
     response = {
         "status": "ok",

@@ -1,8 +1,14 @@
 """Define the databse service managers."""
 
+from decimal import Decimal
+
 import arrow
 
-from mycurrency_exchange_rates.models import Currency, CurrencyExchangeRate
+from mycurrency_exchange_rates.models import (
+    Currency,
+    CurrencyExchangeRate,
+    ExchangeRateProvider,
+)
 
 
 def is_valid_currency(currency_code: str) -> Currency | None:
@@ -68,6 +74,7 @@ def get_conversion_from_database(
         converted_amount = conversion_rate.rate_value * amount
         result = dict(
             status="ok",
+            provider="BDD",
             from_currency=from_currency,
             to_currency=to_currency,
             rate_value=str(conversion_rate.rate_value),
@@ -132,3 +139,56 @@ def exists_currency_rates_during_interval_for_pair_of_currencies(
         from_date=from_date.date(),
         to_date=to_date.date(),
     ) == len(list(arrow.Arrow.span_range("day", from_date, to_date)))
+
+
+def set_next_provider_by_priority() -> dict:
+    """Set the next provider available progrmmatically according to the next highest priority.
+
+    Returns:
+        dict: dictionnary with a status and the providers that were activated/deactivated.
+    """
+    current_provider = ExchangeRateProvider.objects.filter(
+        active_status=True
+    ).first()
+    if current_provider is None:
+        return {
+            "status": "ko",
+            "message": "No provider available at the moment.",
+        }
+
+    next_provider = (
+        ExchangeRateProvider.objects.filter(active_status=False)
+        .order_by("priority")
+        .first()
+    )
+
+    current_provider.active_status = False
+    next_provider.active_status = True
+    current_provider.save()
+    next_provider.save()
+
+    return {
+        "provider-deprioritized": current_provider.provider_name,
+        "provider-prioritized": next_provider.provider_name,
+        "status": "ok",
+    }
+
+
+def store_conversion_to_DB(
+    from_currency_code: str, to_currency_code: str, rate_value, valuated_date
+):
+    """Store a rate conversion to the database."""
+    print("from_currency_code => {}".format(from_currency_code))
+    print("to_currency_code => {}".format(to_currency_code))
+    print("rate_value => {}".format(rate_value))
+    print("valuated_date => {}".format(valuated_date))
+    CurrencyExchangeRate.objects.create(
+        source_currency=Currency.objects.filter(
+            code=from_currency_code
+        ).first(),
+        exchanged_currency=Currency.objects.filter(
+            code=to_currency_code
+        ).first(),
+        valuation_date=valuated_date,
+        rate_value=Decimal(rate_value),
+    )
