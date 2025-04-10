@@ -18,6 +18,10 @@ This is a Django Rest project and as such a set of command reminders are prompte
 ## 5. Add the exchange rate data history:
     python ./manage.py bulk_import_exchange_rates_dataset
 
+## Starting the redis cache server
+    cd ./build-run-commands
+    ./002.a.start-redis-cache.ps1
+
 ## Starting the database container
     # cd ./build-run-commands
     # ./001.a.start-database.ps1
