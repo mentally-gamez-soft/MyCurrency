@@ -1,0 +1,18 @@
+HTTP/1.1 200 OK
+Date: Thu, 10 Apr 2025 14:52:43 GMT
+Server: WSGIServer/0.2 CPython/3.11.9
+Content-Type: application/json
+Vary: Accept, Cookie
+Allow: GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+X-Frame-Options: DENY
+Content-Length: 99
+X-Content-Type-Options: nosniff
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+{
+  "url": "http://localhost:8002/api/v1/currency/6/",
+  "code": "JHG",
+  "name": "Test Update",
+  "symbol": "◄"
+}

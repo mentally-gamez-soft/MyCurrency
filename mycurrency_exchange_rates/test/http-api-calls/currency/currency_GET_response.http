@@ -1,0 +1,38 @@
+HTTP/1.1 200 OK
+Date: Thu, 10 Apr 2025 14:42:45 GMT
+Server: WSGIServer/0.2 CPython/3.11.9
+Content-Type: application/json
+Vary: Accept, Cookie
+Allow: GET, POST, HEAD, OPTIONS
+X-Frame-Options: DENY
+Content-Length: 392
+X-Content-Type-Options: nosniff
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+[
+  {
+    "url": "http://localhost:8002/api/v1/currency/2/",
+    "code": "EUR",
+    "name": "Euro",
+    "symbol": "€"
+  },
+  {
+    "url": "http://localhost:8002/api/v1/currency/3/",
+    "code": "CHF",
+    "name": "Swiss franc",
+    "symbol": "Fr."
+  },
+  {
+    "url": "http://localhost:8002/api/v1/currency/4/",
+    "code": "USD",
+    "name": "US Dollar",
+    "symbol": "$"
+  },
+  {
+    "url": "http://localhost:8002/api/v1/currency/5/",
+    "code": "GBP",
+    "name": "Pound Sterling",
+    "symbol": "£"
+  }
+]

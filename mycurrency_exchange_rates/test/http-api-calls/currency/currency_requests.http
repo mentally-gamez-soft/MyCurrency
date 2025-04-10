@@ -1,0 +1,35 @@
+@LocalUrl=http://localhost:8002/api/v1
+
+
+GET {{LocalUrl}}/currency/
+
+###
+
+
+POST {{LocalUrl}}/currency/
+Content-Type: application/json
+
+{
+    "code": "ODS",
+    "name": "Test Fake Currency",
+    "symbol":"ø"
+}
+
+###
+
+
+PUT {{LocalUrl}}/currency/6/
+Content-Type: application/json
+
+{
+    "code": "JHG",
+    "name": "Test Update",
+    "symbol":"◄"
+}
+
+###
+
+
+DELETE {{LocalUrl}}/currency/6/
+
+###

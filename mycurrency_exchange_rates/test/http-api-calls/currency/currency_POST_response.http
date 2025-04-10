@@ -1,0 +1,19 @@
+HTTP/1.1 201 Created
+Date: Thu, 10 Apr 2025 14:49:50 GMT
+Server: WSGIServer/0.2 CPython/3.11.9
+Content-Type: application/json
+Location: http://localhost:8002/api/v1/currency/6/
+Vary: Accept, Cookie
+Allow: GET, POST, HEAD, OPTIONS
+X-Frame-Options: DENY
+Content-Length: 105
+X-Content-Type-Options: nosniff
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+{
+  "url": "http://localhost:8002/api/v1/currency/6/",
+  "code": "ODS",
+  "name": "Test Fake Currency",
+  "symbol": "ø"
+}

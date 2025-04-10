@@ -1,0 +1,191 @@
+@LocalUrl=http://localhost:8002/api/v1
+
+
+#######  Simple GET indicate that the parameters are needed.
+
+GET {{LocalUrl}}/currency-converter/
+
+###
+
+HTTP/1.1 200 OK
+Date: Thu, 10 Apr 2025 14:56:53 GMT
+Server: WSGIServer/0.2 CPython/3.11.9
+Content-Type: application/json
+Vary: Accept, Cookie
+Allow: GET, POST, HEAD, OPTIONS
+Expires: Thu, 10 Apr 2025 15:26:53 GMT
+Cache-Control: max-age=1800
+X-Frame-Options: DENY
+Content-Length: 74
+X-Content-Type-Options: nosniff
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+[
+  {
+    "status": "ko",
+    "message": "The currency code source must be specified !"
+  }
+]
+
+
+
+#######  GET with only the base currency indicate that it lacks parameters.
+
+GET {{LocalUrl}}/currency-converter/?from_currency=GBP/
+
+#######
+
+HTTP/1.1 200 OK
+Date: Thu, 10 Apr 2025 14:57:52 GMT
+Server: WSGIServer/0.2 CPython/3.11.9
+Content-Type: application/json
+Vary: Accept, Cookie
+Allow: GET, POST, HEAD, OPTIONS
+Expires: Thu, 10 Apr 2025 15:27:52 GMT
+Cache-Control: max-age=1800
+X-Frame-Options: DENY
+Content-Length: 78
+X-Content-Type-Options: nosniff
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+[
+  {
+    "status": "ko",
+    "mesage": "The currency code destination must be specified !"
+  }
+]
+
+
+############ GET with base and target currencies indicate that it lacks the date
+
+GET {{LocalUrl}}/currency-converter/?from_currency=GBP&to_currency=EUR/
+
+#####
+
+HTTP/1.1 200 OK
+Date: Thu, 10 Apr 2025 15:00:50 GMT
+Server: WSGIServer/0.2 CPython/3.11.9
+Content-Type: application/json
+Vary: Accept, Cookie
+Allow: GET, POST, HEAD, OPTIONS
+Expires: Thu, 10 Apr 2025 15:28:59 GMT
+Cache-Control: max-age=1800
+Age: 111
+X-Frame-Options: DENY
+Content-Length: 67
+X-Content-Type-Options: nosniff
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+[
+  {
+    "status": "ko",
+    "mesage": "The valuation date must be specified !"
+  }
+]
+####################
+
+
+####  GET with base currency, target currency and a date in the future. Impossible.
+GET {{LocalUrl}}/currency-converter/?from_currency=GBP&to_currency=EUR&valuation_date=2025-5-5/
+
+###############
+
+HTTP/1.1 200 OK
+Date: Thu, 10 Apr 2025 15:02:01 GMT
+Server: WSGIServer/0.2 CPython/3.11.9
+Content-Type: application/json
+Vary: Accept, Cookie
+Allow: GET, POST, HEAD, OPTIONS
+Expires: Thu, 10 Apr 2025 15:32:01 GMT
+Cache-Control: max-age=1800
+X-Frame-Options: DENY
+Content-Length: 62
+X-Content-Type-Options: nosniff
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+[
+  {
+    "status": "ko",
+    "mesage": "The valuation date is incorrect !"
+  }
+]
+
+
+############################################################
+
+
+##### GET data that exist in the database => they are retrieved from the cache or the database
+## 496 records in the DB currently.
+### 496 records after the call.
+
+GET {{LocalUrl}}/currency-converter/?from_currency=GBP&to_currency=CHF&valuation_date=2025-4-1
+
+######################################
+
+HTTP/1.1 200 OK
+Date: Thu, 10 Apr 2025 15:14:50 GMT
+Server: WSGIServer/0.2 CPython/3.11.9
+Content-Type: application/json
+Vary: Accept, Cookie
+Allow: GET, POST, HEAD, OPTIONS
+Expires: Thu, 10 Apr 2025 15:44:50 GMT
+Cache-Control: max-age=1800
+X-Frame-Options: DENY
+Content-Length: 141
+X-Content-Type-Options: nosniff
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+[
+  {
+    "status": "ok",
+    "provider": "BDD",
+    "from_currency": "GBP",
+    "to_currency": "CHF",
+    "rate_value": "1.141472",
+    "amount": 1,
+    "converted_amount": "1.141472"
+  }
+]
+
+
+##############################################################################
+
+##### GET data that does not exist in the database.
+## 496 records in the DB currently.
+### 497 records in databse after the call.
+GET {{LocalUrl}}/currency-converter/?from_currency=EUR&to_currency=USD&valuation_date=2016-8-12
+####
+
+HTTP/1.1 200 OK
+Date: Thu, 10 Apr 2025 15:16:33 GMT
+Server: WSGIServer/0.2 CPython/3.11.9
+Content-Type: application/json
+Vary: Accept, Cookie
+Allow: GET, POST, HEAD, OPTIONS
+Expires: Thu, 10 Apr 2025 15:46:33 GMT
+Cache-Control: max-age=1800
+X-Frame-Options: DENY
+Content-Length: 172
+X-Content-Type-Options: nosniff
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+[
+  {
+    "status": "ok",
+    "provider": "currencybeacon",
+    "api-fct": "request_api_history",
+    "from_currency": "EUR",
+    "to_currency": "USD",
+    "valuation_date": "2016-08-12",
+    "rate_value": 1.1172282
+  }
+]
+
+
+########################################

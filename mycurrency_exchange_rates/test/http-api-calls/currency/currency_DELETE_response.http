@@ -1,0 +1,11 @@
+HTTP/1.1 204 No Content
+Date: Thu, 10 Apr 2025 14:54:04 GMT
+Server: WSGIServer/0.2 CPython/3.11.9
+Vary: Accept, Cookie
+Allow: GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+X-Frame-Options: DENY
+Content-Length: 0
+X-Content-Type-Options: nosniff
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
