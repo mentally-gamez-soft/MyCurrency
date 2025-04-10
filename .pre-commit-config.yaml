@@ -8,6 +8,7 @@ repos:
   rev: 6.3.0
   hooks:
   - id: pydocstyle
+    exclude: migrations/
 
 - repo: https://github.com/psf/black
   rev: stable

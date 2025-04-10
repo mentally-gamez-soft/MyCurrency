@@ -1,0 +1,1 @@
+"""Declare the migrations module."""
